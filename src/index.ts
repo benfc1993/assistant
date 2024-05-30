@@ -10,7 +10,6 @@ const __filename = fileURLToPath(import.meta.url); // get the resolved path to t
 const __dirname = path.dirname(__filename); // get the name of the directory
 
 const MODEL_PATH = path.join(__dirname, "model");
-console.log(MODEL_PATH);
 
 const listeningNotification = {
   title: "KJ",
@@ -38,7 +37,7 @@ const triggerPhrase = "kj";
 
 let listening = false;
 
-vosk.setLogLevel(0);
+vosk.setLogLevel(-1);
 const model = new vosk.Model(MODEL_PATH);
 const rec = new vosk.Recognizer({
   model,
@@ -74,7 +73,6 @@ function processCommand(preprocessedCommand?: string) {
   }
 
   reset();
-  console.log("Waiting...");
   return validCommand;
 }
 
@@ -87,7 +85,6 @@ micInputStream.on("data", (data: Buffer) => {
 
       if (result.includes(triggerPhrase.replace(/\s/g, ""))) {
         if (processCommand(result)) return;
-        console.log("Listening");
         notifier.notify(listeningNotification);
         listening = true;
       }
@@ -97,6 +94,12 @@ micInputStream.on("data", (data: Buffer) => {
 
 function shutdown() {
   console.log("Good Bye");
+  notifier.notify({
+    title: "KJ",
+    message: "Good Bye",
+    sound: false,
+    timeout: false,
+  });
   micInstance.stop();
 }
 
